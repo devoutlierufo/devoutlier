@@ -42,11 +42,39 @@
     }
 
     #current-title {
-      margin: 18px auto 28px;
+      margin: 18px auto 6px;
       text-align: center;
       font-size: 18px;
       line-height: 1.4;
       color: #d0d0d0;
+    }
+
+    #current-count {
+      text-align: center;
+      font-size: 13px;
+      color: #929292;
+      margin-bottom: 14px;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .controls button {
+      background: #383838;
+      color: #d2d2d2;
+      border: 1px solid #555;
+      border-radius: 4px;
+      padding: 8px 18px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .controls button:hover {
+      background: #464646;
     }
 
     .playlist {
@@ -56,10 +84,11 @@
     }
 
     .playlist-item {
-      padding: 14px 12px;
+      padding: 11px 12px;
       border-bottom: 1px solid #3d3d3d;
+      border-left: 3px solid transparent;
       cursor: pointer;
-      line-height: 1.35;
+      line-height: 1.3;
     }
 
     .playlist-item:hover {
@@ -67,7 +96,8 @@
     }
 
     .playlist-item.active {
-      background: #383838;
+      background: #3b3b3b;
+      border-left-color: #9a9a9a;
     }
 
     .playlist-title {
@@ -122,12 +152,18 @@
     </div>
 
     <div id="current-title"></div>
+    <div id="current-count"></div>
+
+    <div class="controls">
+      <button id="previous-button">Previous</button>
+      <button id="next-button">Next</button>
+    </div>
 
     <div id="playlist-visible" class="playlist"></div>
 
   </div>
 
-  <script src="playlist.js?v=2"></script>
+  <script src="playlist.js?v=3"></script>
 
   <script>
     let player;
@@ -225,11 +261,24 @@
       playVideo(currentIndex);
     }
 
+    function playPreviousVideo() {
+      currentIndex--;
+
+      if (currentIndex < 0) {
+        currentIndex = playlist.length - 1;
+      }
+
+      playVideo(currentIndex);
+    }
+
     function updateDisplay() {
       const item = playlist[currentIndex];
 
-      document.getElementById('current-title')
-        .textContent = item.title;
+      document.getElementById('current-title').textContent =
+        item.title;
+
+      document.getElementById('current-count').textContent =
+        (currentIndex + 1) + ' of ' + playlist.length;
 
       document
         .querySelectorAll('.playlist-item')
@@ -245,8 +294,38 @@
 
       if (active) {
         active.classList.add('active');
+        keepActiveVisible(active);
       }
     }
+
+    function keepActiveVisible(active) {
+      const container = document.getElementById('playlist-visible');
+
+      const containerRect = container.getBoundingClientRect();
+      const activeRect = active.getBoundingClientRect();
+
+      if (activeRect.top < containerRect.top) {
+        container.scrollBy({
+          top: activeRect.top - containerRect.top,
+          behavior: 'smooth'
+        });
+      }
+
+      if (activeRect.bottom > containerRect.bottom) {
+        container.scrollBy({
+          top: activeRect.bottom - containerRect.bottom,
+          behavior: 'smooth'
+        });
+      }
+    }
+
+    document
+      .getElementById('previous-button')
+      .addEventListener('click', playPreviousVideo);
+
+    document
+      .getElementById('next-button')
+      .addEventListener('click', playNextVideo);
 
     buildVisiblePlaylist();
   </script>
