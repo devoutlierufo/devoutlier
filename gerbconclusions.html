@@ -12,23 +12,22 @@
   <div id="player"></div>
 
   <script>
-    // Load YouTube's IFrame Player API
     const tag = document.createElement('script');
     tag.src = "https://www.youtube.com/iframe_api";
 
     const firstScriptTag = document.getElementsByTagName('script')[0];
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-    // YouTube calls this automatically once the API is ready
     let player;
 
     function onYouTubeIframeAPIReady() {
       player = new YT.Player('player', {
         height: '390',
         width: '640',
-        videoId: '107BtDYhTkA'
+        videoId: '107BtDYhTkA',
         playerVars: {
           start: 7046
+        }
       });
     }
   </script>
