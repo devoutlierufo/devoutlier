@@ -51,6 +51,8 @@
 
     .playlist {
       border-top: 1px solid #444;
+      max-height: 420px;
+      overflow-y: auto;
     }
 
     .playlist-item {
@@ -70,12 +72,26 @@
 
     .playlist-title {
       color: #d2d2d2;
+      font-size: 14px;
     }
 
     .playlist-time {
-      margin-top: 4px;
+      margin-top: 3px;
       color: #929292;
-      font-size: 13px;
+      font-size: 12px;
+    }
+
+    .playlist::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .playlist::-webkit-scrollbar-track {
+      background: #262626;
+    }
+
+    .playlist::-webkit-scrollbar-thumb {
+      background: #555;
+      border-radius: 4px;
     }
 
     @media (max-width: 600px) {
