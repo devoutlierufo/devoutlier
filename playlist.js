@@ -1,4 +1,4 @@
-"const playlist = [
+const playlist = [
   {
     ""title"": ""UFOs and Nuclear Weapons - A Fascinating Connection"",
     ""videoId"": ""-DK2u8HlhDE"",
@@ -263,4 +263,4 @@
     ""timestamp"": ""1:57:26"",
     ""start"": 7046
   }
-];"
+];
