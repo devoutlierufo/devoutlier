@@ -2,34 +2,237 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>UAP Gerb Conclusions</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UAP Gerb - Conclusions Playlist</title>
+
+  <style>
+    body {
+      margin: 0;
+      background: #262626;
+      color: #d2d2d2;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .page {
+      width: 92%;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 0 60px;
+    }
+
+    h1 {
+      margin: 0 0 28px;
+      text-align: center;
+      font-size: 30px;
+      font-weight: 500;
+      color: #dddddd;
+    }
+
+    .player-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      margin: 0 auto;
+      background: #1d1d1d;
+    }
+
+    #player {
+      width: 100%;
+      height: 100%;
+    }
+
+    #current-title {
+      margin: 18px auto 28px;
+      text-align: center;
+      font-size: 18px;
+      line-height: 1.4;
+      color: #d0d0d0;
+    }
+
+    .playlist {
+      border-top: 1px solid #444;
+    }
+
+    .playlist-item {
+      padding: 14px 12px;
+      border-bottom: 1px solid #3d3d3d;
+      cursor: pointer;
+      line-height: 1.35;
+    }
+
+    .playlist-item:hover {
+      background: #303030;
+    }
+
+    .playlist-item.active {
+      background: #383838;
+    }
+
+    .playlist-title {
+      color: #d2d2d2;
+    }
+
+    .playlist-time {
+      margin-top: 4px;
+      color: #929292;
+      font-size: 13px;
+    }
+
+    @media (max-width: 600px) {
+      .page {
+        width: 95%;
+        padding-top: 25px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      #current-title {
+        font-size: 16px;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-  <h1>UAP Gerb Conclusions</h1>
+  <div class="page">
 
-  <div id="player"></div>
+    <h1>UAP Gerb - Conclusions Playlist</h1>
+
+    <div class="player-wrap">
+      <div id="player"></div>
+    </div>
+
+    <div id="current-title"></div>
+
+    <div id="playlist-visible" class="playlist"></div>
+
+  </div>
+
+  <script src="playlist.js"></script>
 
   <script>
+    let player;
+    let currentIndex = 0;
+
+    function buildVisiblePlaylist() {
+      const container = document.getElementById('playlist-visible');
+
+      playlist.forEach((item, index) => {
+        const row = document.createElement('div');
+
+        row.className = 'playlist-item';
+        row.dataset.index = index;
+
+        const title = document.createElement('div');
+        title.className = 'playlist-title';
+        title.textContent = item.title;
+
+        const time = document.createElement('div');
+        time.className = 'playlist-time';
+        time.textContent = 'Conclusion — ' + item.timestamp;
+
+        row.appendChild(title);
+        row.appendChild(time);
+
+        row.addEventListener('click', function () {
+          playVideo(index);
+        });
+
+        container.appendChild(row);
+      });
+    }
+
     const tag = document.createElement('script');
-    tag.src = "https://www.youtube.com/iframe_api";
+    tag.src = 'https://www.youtube.com/iframe_api';
 
     const firstScriptTag = document.getElementsByTagName('script')[0];
-    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-    let player;
+    firstScriptTag.parentNode.insertBefore(
+      tag,
+      firstScriptTag
+    );
 
     function onYouTubeIframeAPIReady() {
+      if (!playlist || playlist.length === 0) {
+        return;
+      }
+
+      const first = playlist[0];
+
       player = new YT.Player('player', {
-        height: '390',
-        width: '640',
-        videoId: '107BtDYhTkA',
+        width: '100%',
+        height: '100%',
+        videoId: first.videoId,
+
         playerVars: {
-          start: 7046
+          start: first.start,
+          rel: 0
+        },
+
+        events: {
+          onReady: function () {
+            updateDisplay();
+          },
+
+          onStateChange: function (event) {
+            if (event.data === YT.PlayerState.ENDED) {
+              playNextVideo();
+            }
+          }
         }
       });
     }
+
+    function playVideo(index) {
+      currentIndex = index;
+
+      const item = playlist[currentIndex];
+
+      player.loadVideoById({
+        videoId: item.videoId,
+        startSeconds: item.start
+      });
+
+      updateDisplay();
+    }
+
+    function playNextVideo() {
+      currentIndex++;
+
+      if (currentIndex >= playlist.length) {
+        currentIndex = 0;
+      }
+
+      playVideo(currentIndex);
+    }
+
+    function updateDisplay() {
+      const item = playlist[currentIndex];
+
+      document.getElementById('current-title')
+        .textContent = item.title;
+
+      document
+        .querySelectorAll('.playlist-item')
+        .forEach(function (row) {
+          row.classList.remove('active');
+        });
+
+      const active = document.querySelector(
+        '.playlist-item[data-index="' +
+        currentIndex +
+        '"]'
+      );
+
+      if (active) {
+        active.classList.add('active');
+      }
+    }
+
+    buildVisiblePlaylist();
   </script>
 
 </body>
